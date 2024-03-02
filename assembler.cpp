@@ -139,7 +139,7 @@ enum Asm_error assembly_file (char** lines, size_t line_counter, FILE* asm_file,
         bool is_cmd = false;
         for (size_t j = 0; j < N_CMDS; j++)
         {
-            if (strncmp (cmd, CMD[j].name, MAX_SYMB) != 0)
+            if (strncmp (cmd, CMD[j].name, len_cmd) != 0)
             {
                 continue;
             }
