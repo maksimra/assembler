@@ -113,23 +113,23 @@ size_t line_processing (size_t size, char* buffer)
     return line_counter;
 }
 
-enum Asm_error assembly_file (char** lines, size_t line_counter, FILE* asm_file, char* ) // FILE* asm_file, char** output_str
+enum Asm_error assembly_file (char** lines, size_t line_counter) // FILE* asm_file, char** output_str
 {
     PRINT_BEGIN();
     FILE *assemble_file = fopen ("assemble_file.txt", "wb"); // super cringe
     if (assemble_file == NULL)
         return ASM_ERROR_FOPEN;
     char cmd[MAX_SYMB] = {0};
-    char* bin_cmd = (char*) calloc (line_counter, 2 * sizeof (double) + 1); // структуру в реалокацию
-    /////// error check?
-    size_t position = 0; // I DONT UNDERSTAND ЗАПИСАННЫЕ БАЙТЫ
+    char* bin_cmd = (char*) calloc (line_counter, sizeof (double) + sizeof (char)); // структуру в реалокацию
+    size_t bin_pos = 0;
+    /////// error check? // I DONT UNDERSTAND ЗАПИСАННЫЕ БАЙТЫ
     double digit = NAN; // переменные в структуру
 
     printf("%d\n", line_counter);
 
-    for (size_t pass = 0; pass < line_counter; pass++) // line_number (n_line)
+    for (size_t n_line = 0; n_line < line_counter; n_line++) // line_number (n_line)
     {
-        char* cur_line = lines[pass];
+        char* cur_line = lines[n_line];
         int len_cmd = 0;
         len_cmd = sscanf (cur_line, "%s", cmd);
         if (len_cmd == -1) // длину забрать
@@ -144,7 +144,7 @@ enum Asm_error assembly_file (char** lines, size_t line_counter, FILE* asm_file,
                 continue;
             }
             is_cmd = true;
-            bin_cmd[position] = CMD[j].number;
+            bin_cmd[bin_pos] = CMD[j].number;
             cur_line += CMD[j].length;
             if (CMD[j].has_arg)
             {
@@ -160,22 +160,23 @@ enum Asm_error assembly_file (char** lines, size_t line_counter, FILE* asm_file,
                 }
                 if (has_reg)
                 {
-                    bin_cmd[position] |= MASK_REG;
-                    position += sizeof (char);
-                    *(bin_cmd + position) = *(cur_line);
-                    position += sizeof (char);
+                    bin_cmd[bin_pos] |= MASK_REG;
+                    bin_pos += sizeof (char);
+                    bin_cmd[bin_pos] = *cur_line;
+                    bin_pos += sizeof (char);
                 }
                 else
                 {
-                    *(bin_cmd + position) |= MASK_NUMBER;
-                    position += sizeof (char);
-                    *(double*)(bin_cmd + position) = *(double*)(cur_line); // scanf
-                    position += sizeof (double);
+                    bin_cmd[bin_pos] |= MASK_NUMBER;
+                    bin_pos += sizeof (char);
+                    sscanf (cur_line, "%lf", bin_cmd + bin_pos);
+                    bin_pos += sizeof (double);
+                    //*(double*)(bin_cmd + position) = *(double*)(cur_line); // scanf
                 }
             }
             else
             {
-                position += sizeof (char);
+                bin_pos += sizeof (char);
             }
         }
         if (!is_cmd)
@@ -183,7 +184,7 @@ enum Asm_error assembly_file (char** lines, size_t line_counter, FILE* asm_file,
             return ASM_NOT_CMD;
         }
     }
-    fwrite (bin_cmd, sizeof (char), position, assemble_file);
+    fwrite (bin_cmd, sizeof (char), bin_pos, assemble_file);
     fclose (assemble_file);
     PRINT_END();
     return ASM_NO_ERROR;
@@ -194,7 +195,7 @@ enum Asm_error assembly_file (char** lines, size_t line_counter, FILE* asm_file,
 
 void skip_space (char** line)
 {
-    for (size_t i = 0; isspace (*line[i]); i++)
+    for (size_t i = 0; isspace (**line); i++)
     {
         (*line)++;
     }
