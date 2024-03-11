@@ -122,7 +122,7 @@ enum Asm_error assembly_file (char** lines, size_t line_counter) // FILE* asm_fi
     char cmd[MAX_SYMB] = {0};
     char* bin_cmd = (char*) calloc (line_counter, sizeof (double) + sizeof (char)); // структуру в реалокацию
     size_t bin_pos = 0;
-    /////// error check? // I DONT UNDERSTAND ЗАПИСАННЫЕ БАЙТЫ
+    /////// error check?
     double digit = NAN; // переменные в структуру
 
     printf("%d\n", line_counter);
@@ -130,27 +130,27 @@ enum Asm_error assembly_file (char** lines, size_t line_counter) // FILE* asm_fi
     for (size_t n_line = 0; n_line < line_counter; n_line++) // line_number (n_line)
     {
         char* cur_line = lines[n_line];
-        int len_cmd = 0;
-        len_cmd = sscanf (cur_line, "%s", cmd);
-        if (len_cmd == -1) // длину забрать
-        {
-            return ASM_ERROR_SSCANF;
-        }
+        sscanf (cur_line, "%s", cmd);
+        printf ("nline = %zu cmd pr = %s\n", n_line, cmd);
         bool is_cmd = false;
         for (size_t j = 0; j < N_CMDS; j++)
         {
-            if (strncmp (cmd, CMD[j].name, len_cmd) != 0)
+            if (strcmp (cmd, CMD[j].name) != 0)
             {
+                printf ("Я в IF - cmd == %s  CMD[j].name = %s\n", cmd, CMD[j].name);
                 continue;
             }
+            printf ("[Имя команды == %s\n", cmd);
+            printf ("[Бажное имя команды == %s\n", CMD[j].name);
             is_cmd = true;
             bin_cmd[bin_pos] = CMD[j].number;
             cur_line += CMD[j].length;
             if (CMD[j].has_arg)
             {
-                bool has_reg = false; // skipspace!!!
+                bool has_reg = false;
                 skip_space (&cur_line); // разбить на функции
-                for (size_t i = 0; i < N_REGS; i++)
+                size_t i = 0;
+                for ( ; i < N_REGS; i++)
                 {
                     if (strncmp (cur_line, REG[i].name, MAX_SYMB) == 0)
                     {
@@ -160,9 +160,13 @@ enum Asm_error assembly_file (char** lines, size_t line_counter) // FILE* asm_fi
                 }
                 if (has_reg)
                 {
+                    printf ("Номер команды без маски == %d\n", CMD[j].number);
                     bin_cmd[bin_pos] |= MASK_REG;
+                    printf ("Имя команды == %s\n", cmd);
+                    printf ("Бажное имя команды == %s\n", CMD[j].name);
+                    printf ("Текущий номер команды = %d\n", bin_cmd[bin_pos]);
                     bin_pos += sizeof (char);
-                    bin_cmd[bin_pos] = *cur_line;
+                    bin_cmd[bin_pos] = REG[i].number;
                     bin_pos += sizeof (char);
                 }
                 else
@@ -171,7 +175,6 @@ enum Asm_error assembly_file (char** lines, size_t line_counter) // FILE* asm_fi
                     bin_pos += sizeof (char);
                     sscanf (cur_line, "%lf", bin_cmd + bin_pos);
                     bin_pos += sizeof (double);
-                    //*(double*)(bin_cmd + position) = *(double*)(cur_line); // scanf
                 }
             }
             else

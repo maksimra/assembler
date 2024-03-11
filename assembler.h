@@ -28,13 +28,13 @@ enum Asm_error
 enum Cmd
 {
     PUSH = 1,
-    ADD = 2,
-    SUB = 3,
-    MUL = 4,
-    DIV = 5,
-    OUT = 6,
-    IN = 7,
-    POP = 8,
+    POP = 2,
+    ADD = 3,
+    SUB = 4,
+    MUL = 5,
+    DIV = 6,
+    OUT = 7,
+    IN = 8,
     HLT = -1
 };
 
@@ -70,15 +70,15 @@ struct Cmds
 
 const Cmds CMD[] =
 {
-    {"PUSH", PUSH, true, 4},
-    {"ADD", ADD, false, 3},
-    {"SUB", SUB, false, 3},
-    {"MUL", MUL, false, 3},
-    {"DIV", DIV, false, 3},
-    {"OUT", OUT, false, 3},
-    {"IN", IN, false, 2},
-    {"POP", POP, true, 3},
-    {"HLT", HLT, false, 3}
+    {"PUSH", PUSH, true,  4},
+    {"ADD",  ADD,  false, 3},
+    {"SUB",  SUB,  false, 3},
+    {"MUL",  MUL,  false, 3},
+    {"DIV",  DIV,  false, 3},
+    {"OUT",  OUT,  false, 3},
+    {"IN",   IN,   false, 2},
+    {"POP",  POP,  true,  3},
+    {"HLT",  HLT,  false, 3}
 };
 
 enum Mask_arg
