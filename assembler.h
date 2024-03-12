@@ -21,7 +21,8 @@ enum Asm_error
     ASM_ERROR_STAT = 7,
     ASM_ERROR_STRCHR = 8,
     ASM_CALLOC_FAIL = 9,
-    ASM_NOT_CMD = 10
+    ASM_NOT_CMD = 10,
+    ASM_NO_MARK = 11
 };
 
 
@@ -35,6 +36,7 @@ enum Cmd
     DIV = 6,
     OUT = 7,
     IN = 8,
+    JMP = 9,
     HLT = -1
 };
 
@@ -65,20 +67,22 @@ struct Cmds
     const char* name;
     enum Cmd number;
     bool has_arg;
+    bool has_mark;
     size_t length;
 };
 
 const Cmds CMD[] =
 {
-    {"PUSH", PUSH, true,  4},
-    {"ADD",  ADD,  false, 3},
-    {"SUB",  SUB,  false, 3},
-    {"MUL",  MUL,  false, 3},
-    {"DIV",  DIV,  false, 3},
-    {"OUT",  OUT,  false, 3},
-    {"IN",   IN,   false, 2},
-    {"POP",  POP,  true,  3},
-    {"HLT",  HLT,  false, 3}
+    {"PUSH", PUSH, true, false, 4},
+    {"ADD",  ADD,  false, false, 3},
+    {"SUB",  SUB,  false, false, 3},
+    {"MUL",  MUL,  false, false, 3},
+    {"DIV",  DIV,  false, false, 3},
+    {"OUT",  OUT,  false, false, 3},
+    {"IN",   IN,   false, false, 2},
+    {"POP",  POP,  true, false,  3},
+    {"JMP", JMP, true, true, 3},
+    {"HLT",  HLT,  false, false, 3}
 };
 
 enum Mask_arg

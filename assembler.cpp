@@ -119,7 +119,7 @@ enum Asm_error assembly_file (char** lines, size_t line_counter) // FILE* asm_fi
     FILE *assemble_file = fopen ("assemble_file.txt", "wb"); // super cringe
     if (assemble_file == NULL)
         return ASM_ERROR_FOPEN;
-    char cmd[MAX_SYMB] = {0};
+    char cmd[MAX_SYMB] = {};
     char* bin_cmd = (char*) calloc (line_counter, sizeof (double) + sizeof (char)); // структуру в реалокацию
     size_t bin_pos = 0;
     /////// error check?
@@ -131,17 +131,14 @@ enum Asm_error assembly_file (char** lines, size_t line_counter) // FILE* asm_fi
     {
         char* cur_line = lines[n_line];
         sscanf (cur_line, "%s", cmd);
-        printf ("nline = %zu cmd pr = %s\n", n_line, cmd);
         bool is_cmd = false;
         for (size_t j = 0; j < N_CMDS; j++)
         {
             if (strcmp (cmd, CMD[j].name) != 0)
             {
-                printf ("Я в IF - cmd == %s  CMD[j].name = %s\n", cmd, CMD[j].name);
                 continue;
             }
-            printf ("[Имя команды == %s\n", cmd);
-            printf ("[Бажное имя команды == %s\n", CMD[j].name);
+            printf ("Первый проход. Команда == %s\n", cmd);
             is_cmd = true;
             bin_cmd[bin_pos] = CMD[j].number;
             cur_line += CMD[j].length;
@@ -160,11 +157,7 @@ enum Asm_error assembly_file (char** lines, size_t line_counter) // FILE* asm_fi
                 }
                 if (has_reg)
                 {
-                    printf ("Номер команды без маски == %d\n", CMD[j].number);
                     bin_cmd[bin_pos] |= MASK_REG;
-                    printf ("Имя команды == %s\n", cmd);
-                    printf ("Бажное имя команды == %s\n", CMD[j].name);
-                    printf ("Текущий номер команды = %d\n", bin_cmd[bin_pos]);
                     bin_pos += sizeof (char);
                     bin_cmd[bin_pos] = REG[i].number;
                     bin_pos += sizeof (char);
@@ -187,6 +180,7 @@ enum Asm_error assembly_file (char** lines, size_t line_counter) // FILE* asm_fi
             return ASM_NOT_CMD;
         }
     }
+
     fwrite (bin_cmd, sizeof (char), bin_pos, assemble_file);
     fclose (assemble_file);
     PRINT_END();
@@ -238,6 +232,8 @@ const char* asm_get_error (enum Asm_error error)
             return "Ass: Ошибка в выделении памяти (calloc).";
         case ASM_NOT_CMD:
             return "Asm: Не команда.";
+        case ASM_NO_MARK:
+            return "Asm: Нет такого регистра :(";
         default:
             return "Ass: Куда делся мой enum ошибок?";
     }
