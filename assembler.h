@@ -92,6 +92,13 @@ enum Mask_arg
     MASK_NUMBER = 1 << 5
 };
 
+struct Mark
+{
+    char* name;
+    int len;
+    size_t ip;
+};
+
 
 enum Asm_error   my_fread                (size_t size, FILE *fp, char** buffer_ptr);
 enum Asm_error   open_file_and_fill_stat (const char *NAME, struct stat *statbuf, FILE** file);

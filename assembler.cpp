@@ -8,6 +8,10 @@ static FILE* log_file = stderr;
 
 const int MAX_SYMB = 20;
 
+const int MAX_MARKS = 10;
+
+struct Mark marks[MAX_MARKS] = {};
+
 const int N_REGS = 4;
 
 const size_t N_CMDS = sizeof (CMD) / sizeof (CMD[0]);
@@ -113,12 +117,54 @@ size_t line_processing (size_t size, char* buffer)
     return line_counter;
 }
 
+enum Asm_error prim_pass (char** lines, size_t line_counter)
+{
+    printf ("HUUUI\n");
+    int n_marks = 0;
+    char* cur_line = NULL;
+    char cmd[MAX_SYMB] = {};
+    for (size_t n_line = 0; n_line < line_counter; n_line++) // line_number (n_line)
+    {
+        sscanf (cur_line, "%s", cmd);
+        printf ("Команда == %s\n", cmd);
+        cur_line = lines[n_line];
+        sscanf (cur_line, "%s", cmd);
+        bool is_cmd = false;
+        for (size_t j = 0; j < N_CMDS; j++)
+        {
+            if (strcmp (cmd, CMD[j].name) != 0)
+            {
+                continue;
+            }
+            is_cmd = true;
+        }
+        if (!is_cmd)
+        {
+            printf ("Я здесь: %s\n", cmd);
+            skip_space (&cur_line);
+            char* colon = strchr (cur_line, ':');
+            if (colon != NULL)
+            {
+                strncpy (marks[n_marks].name, cur_line, colon - cur_line);
+                printf ("Имя комнанды == %s\n", marks[n_marks].name);
+            }
+            else
+            {
+                return ASM_NOT_CMD;
+            }
+        }
+        return ASM_NO_ERROR;
+    }
+}
+
 enum Asm_error assembly_file (char** lines, size_t line_counter) // FILE* asm_file, char** output_str
 {
     PRINT_BEGIN();
     FILE *assemble_file = fopen ("assemble_file.txt", "wb"); // super cringe
     if (assemble_file == NULL)
         return ASM_ERROR_FOPEN;
+    printf ("Я здееееесь\n");
+    prim_pass (lines, line_counter);
     char cmd[MAX_SYMB] = {};
     char* bin_cmd = (char*) calloc (line_counter, sizeof (double) + sizeof (char)); // структуру в реалокацию
     size_t bin_pos = 0;
@@ -138,7 +184,6 @@ enum Asm_error assembly_file (char** lines, size_t line_counter) // FILE* asm_fi
             {
                 continue;
             }
-            printf ("Первый проход. Команда == %s\n", cmd);
             is_cmd = true;
             bin_cmd[bin_pos] = CMD[j].number;
             cur_line += CMD[j].length;
@@ -151,7 +196,7 @@ enum Asm_error assembly_file (char** lines, size_t line_counter) // FILE* asm_fi
                 {
                     if (strncmp (cur_line, REG[i].name, MAX_SYMB) == 0)
                     {
-                        has_reg = true; // try ... register s proverkoy kotoriy vernet true esli nashel i false esli net
+                        has_reg = true;
                         break;
                     }
                 }
@@ -185,10 +230,7 @@ enum Asm_error assembly_file (char** lines, size_t line_counter) // FILE* asm_fi
     fclose (assemble_file);
     PRINT_END();
     return ASM_NO_ERROR;
-} // 1 - узнает, что за команда
-//2 - try register
-//2 - try number
-//разбить на хорошие функции
+}
 
 void skip_space (char** line)
 {
