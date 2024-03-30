@@ -4,10 +4,11 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
-#include <sys\stat.h>
+#include <sys/stat.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <assert.h>
 
 enum Asm_error
 {
@@ -22,7 +23,8 @@ enum Asm_error
     ASM_ERROR_STRCHR = 8,
     ASM_CALLOC_FAIL = 9,
     ASM_NOT_CMD = 10,
-    ASM_NO_MARK = 11
+    ASM_NO_MARK = 11,
+    ASM_ERROR_READ = 12
 };
 
 
@@ -108,7 +110,11 @@ char**           process_file            (const char* NAME, enum Asm_error* erro
 enum Asm_error   asm_set_log_file        (FILE* file);
 void             asm_print_error         (enum Asm_error error);
 const char*      asm_get_error           (enum Asm_error error);
-enum Asm_error   assembly_file           (char** lines, size_t line_counter);
+enum Asm_error   assembly_file           (char** lines, size_t n_line, Mark* marks, int* n_marks);
 void             skip_space              (char** line);
+void             allocate_mem            (Mark** marks, char** names_array);
+int              search_mark             (char* line, long size, Mark* marks, int n_marks);
+int              search_reg              (char* line, long size);
+int              search_cmd              (char* line, long size);
 
 #endif // ASSEMBLER_H
