@@ -39,6 +39,8 @@ enum Cmd
     OUT = 7,
     IN = 8,
     JMP = 9,
+    CALL = 10,
+    RET = 11,
     HLT = -1
 };
 
@@ -75,15 +77,17 @@ struct Cmds
 
 const Cmds CMD[] =
 {
-    {"PUSH", PUSH, true, false, 4},
+    {"PUSH", PUSH, true,  false, 4},
     {"ADD",  ADD,  false, false, 3},
     {"SUB",  SUB,  false, false, 3},
     {"MUL",  MUL,  false, false, 3},
     {"DIV",  DIV,  false, false, 3},
     {"OUT",  OUT,  false, false, 3},
     {"IN",   IN,   false, false, 2},
-    {"POP",  POP,  true, false,  3},
-    {"JMP", JMP, true, true, 3},
+    {"POP",  POP,  true,  false, 3},
+    {"JMP",  JMP,  true,  true,  3},
+    {"CALL", CALL, true,  true,  4},
+    {"RET",  RET,  false, false, 3},
     {"HLT",  HLT,  false, false, 3}
 };
 
