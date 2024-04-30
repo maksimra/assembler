@@ -10,7 +10,7 @@
 #include <ctype.h>
 #include <assert.h>
 
-enum Asm_error
+enum AsmError
 {
     ASM_NO_ERROR = 0,
     ASM_NULL_PTR_FILE = 1,
@@ -24,7 +24,8 @@ enum Asm_error
     ASM_CALLOC_FAIL = 9,
     ASM_NOT_CMD = 10,
     ASM_NO_MARK = 11,
-    ASM_ERROR_READ = 12
+    ASM_ERROR_READ = 12,
+    ASM_ERROR_ARGC
 };
 
 
@@ -106,19 +107,21 @@ struct Mark
 };
 
 
-enum Asm_error   my_fread                (size_t size, FILE *fp, char** buffer_ptr);
-enum Asm_error   open_file_and_fill_stat (const char *NAME, struct stat *statbuf, FILE** file);
-enum Asm_error   ptr_to_lines            (size_t size, size_t line_counter, char* buffer, char*** lines);
+enum AsmError    my_fread                (size_t size, FILE *fp, char** buffer_ptr);
+enum AsmError    open_file_and_fill_stat (const char *NAME, struct stat *statbuf, FILE** file);
+enum AsmError    ptr_to_lines            (size_t size, size_t line_counter, char* buffer, char*** lines);
 size_t           line_processing         (size_t size, char* buffer);
-char**           process_file            (const char* NAME, enum Asm_error* error, size_t* line_counter);
-enum Asm_error   asm_set_log_file        (FILE* file);
-void             asm_print_error         (enum Asm_error error);
-const char*      asm_get_error           (enum Asm_error error);
-enum Asm_error   assembly_file           (char** lines, size_t n_line, Mark* marks, int* n_marks);
+char**           process_file            (const char* NAME, enum AsmError* error, size_t* line_counter);
+enum AsmError    asm_set_log_file        (FILE* file);
+void             asm_print_error         (enum AsmError error);
+const char*      asm_get_error           (enum AsmError error);
+enum AsmError    assembly_file           (char** lines, size_t n_line, Mark* marks, int* n_marks);
 void             skip_space              (char** line);
-void             allocate_mem            (Mark** marks, char** names_array);
 int              search_mark             (char* line, long size, Mark* marks, int n_marks);
 int              search_reg              (char* line, long size);
 int              search_cmd              (char* line, long size);
+enum AsmError    allocate_mem            (Mark** marks, char** names_array);
+enum AsmError    check_argc              (const int argc);
+
 
 #endif // ASSEMBLER_H
